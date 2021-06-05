@@ -27,13 +27,14 @@ public class Encrypt  {
             String plainText = fileRead(sourceFileName);
 
             if(plainText.isEmpty()){
-                System.out.println("text is empty");
-                return;
+               throw new Exception("file is empty");
+
             }
+
 
             KeyPair keyPair = getKeyPairFromKeyStore(keysFilename);
             String cipherText = encrypt(plainText, keyPair.getPublic());
-            System.out.println(cipherText);
+
 
          String signature = sign("foobar", keyPair.getPrivate());
 
@@ -88,8 +89,6 @@ public class Encrypt  {
 
         String fileDestPath = fileBasePath+"\\"+fileName;
 
-        System.out.println(fileDestPath);
-
         FileWriter fileWriter = new FileWriter(fileDestPath);
 
         BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
@@ -106,9 +105,6 @@ public class Encrypt  {
 
         StringBuilder plainText = new StringBuilder();
 
-
-       // System.out.println(total.toString());
-
         String fileSourcePath = fileBasePath+"\\"+fileName;
 
         FileReader fileReader = new FileReader(fileSourcePath);
@@ -116,10 +112,9 @@ public class Encrypt  {
         BufferedReader bufferedReader = new BufferedReader(fileReader);
 
         String text;
-       // String para = "";
+
 
         while((text=bufferedReader.readLine())!=null){
-//            para += text + " ";
             plainText.append(text);
         }
 
