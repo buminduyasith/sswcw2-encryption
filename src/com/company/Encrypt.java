@@ -1,6 +1,9 @@
 package com.company;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import java.io.*;
 import java.security.*;
 import java.util.Base64;
@@ -76,53 +79,81 @@ public class Encrypt  {
     }
 
 
-    public static String encrypt(String plainText, PublicKey publicKey) throws Exception {
-        Cipher encryptCipher = Cipher.getInstance("RSA");
-        encryptCipher.init(Cipher.ENCRYPT_MODE, publicKey);
+    public static String encrypt(String plainText, PublicKey publicKey) {
 
-        byte[] cipherText = encryptCipher.doFinal(plainText.getBytes(UTF_8));
+        byte[] cipherText = new byte[0];
+        try{
+            Cipher encryptCipher = Cipher.getInstance("RSA");
+            encryptCipher.init(Cipher.ENCRYPT_MODE, publicKey);
+
+            cipherText = encryptCipher.doFinal(plainText.getBytes(UTF_8));
+
+          
+        }catch (NoSuchPaddingException | NoSuchAlgorithmException algException){
+            System.out.println("something went wrong with the Algorithm");
+            
+        }catch (InvalidKeyException invalidKeyException){
+            System.out.println("something went wrong with given key");
+            
+        }catch (BadPaddingException | IllegalBlockSizeException exception ){
+
+            System.out.println(exception.getMessage());
+        }
 
         return Base64.getEncoder().encodeToString(cipherText);
     }
 
-    public static  void fileWrite(String fileName,String cipherText) throws Exception{
+    public static  void fileWrite(String fileName,String cipherText){
 
-        String fileDestPath = fileBasePath+"\\"+fileName;
+        try{
 
-        FileWriter fileWriter = new FileWriter(fileDestPath);
+            String fileDestPath = fileBasePath+"\\"+fileName;
 
-        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            System.out.println(fileDestPath);
 
-        bufferedWriter.write(cipherText);
+            FileWriter fileWriter = new FileWriter(fileDestPath);
 
-        bufferedWriter.close();
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
+            bufferedWriter.write(cipherText);
+
+            bufferedWriter.close();
+        }catch (IOException ioException){
+            System.out.println(ioException.getMessage());
+        }catch (Exception exception){
+            System.out.println(exception.getMessage());
+        }
 
 
     }
 
-    public static String fileRead(String fileName) throws Exception{
-
+    public static String fileRead(String fileName) {
 
         StringBuilder plainText = new StringBuilder();
-
         String fileSourcePath = fileBasePath+"\\"+fileName;
+        try{
 
-        FileReader fileReader = new FileReader(fileSourcePath);
+            FileReader fileReader = new FileReader(fileSourcePath);
 
-        BufferedReader bufferedReader = new BufferedReader(fileReader);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
 
-        String text;
+            String text;
 
 
-        while((text=bufferedReader.readLine())!=null){
-            plainText.append(text);
+            while((text=bufferedReader.readLine())!=null){
+                plainText.append(text);
+            }
+
+            bufferedReader.close();
+
+           
+        }catch (FileNotFoundException fileNotFoundException){
+            System.out.println("file can't find");
+        }catch (IOException ioException){
+            System.out.println(ioException.getMessage());
         }
-
-        bufferedReader.close();
-
+        
         return plainText.toString();
-
-
 
 
     }
